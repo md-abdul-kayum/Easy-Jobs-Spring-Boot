@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            background: URL('/css/bg.jpg');
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            color: #4CAF50;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            color: #4CAF50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn-block {
+            background-color: #f44336;
+        }
+        .btn-block:hover {
+            background-color: #d32f2f;
+        }
+        .btn-unblock {
+            background-color: #4CAF50;
+        }
+        .btn-unblock:hover {
+            background-color: #45a049;
+        }
+         header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        header button {
+            background-color: #fff;
+            color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+        <h1>Welcome Admin</h1>
+        <button id="logoutBtn">Logout</button>
+    </header>
+        <div class="section">
+            <h3>Recruiters</h3>
+            <table class="table" id="recruiterTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Company</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Recruiter data will be appended here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="section">
+            <h3>Job Seekers</h3>
+            <table class="table" id="jobSeekerTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Job seeker data will be appended here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+<footer>
+        <p>&copy; Easy Jobs || Md. Abdul Kayum || All Right Reserved</p>
+    </footer>
+    <script>
+        function fetchRecruiters() {
+            fetch('/api/admin/recruiters')
+                .then(response => response.json())
+                .then(data => {
+                    const recruiterTable = document.getElementById('recruiterTable').getElementsByTagName('tbody')[0];
+                    recruiterTable.innerHTML = '';
+                    data.forEach(recruiter => {
+                        const row = recruiterTable.insertRow();
+                        row.insertCell(0).innerText = recruiter.id;
+                        row.insertCell(1).innerText = recruiter.personalName;
+                        row.insertCell(2).innerText = recruiter.companyName;
+                        row.insertCell(3).innerText = recruiter.email;
+                        const actionCell = row.insertCell(4);
+                        const blockButton = document.createElement('button');
+                        blockButton.innerText = recruiter.blocked ? 'Unblock' : 'Block';
+                        blockButton.classList.add('btn', recruiter.blocked ? 'btn-unblock' : 'btn-block');
+                        blockButton.onclick = () => toggleBlockRecruiter(recruiter.id, !recruiter.blocked);
+                        actionCell.appendChild(blockButton);
+                    });
+                });
+        }
+
+        function fetchJobSeekers() {
+            fetch('/api/admin/job-seekers')
+                .then(response => response.json())
+                .then(data => {
+                    const jobSeekerTable = document.getElementById('jobSeekerTable').getElementsByTagName('tbody')[0];
+                    jobSeekerTable.innerHTML = '';
+                    data.forEach(jobSeeker => {
+                        const row = jobSeekerTable.insertRow();
+                        row.insertCell(0).innerText = jobSeeker.id;
+                        row.insertCell(1).innerText = jobSeeker.name;
+                        row.insertCell(2).innerText = jobSeeker.email;
+                        const actionCell = row.insertCell(3);
+                        const blockButton = document.createElement('button');
+                        blockButton.innerText = jobSeeker.blocked ? 'Unblock' : 'Block';
+                        blockButton.classList.add('btn', jobSeeker.blocked ? 'btn-unblock' : 'btn-block');
+                        blockButton.onclick = () => toggleBlockJobSeeker(jobSeeker.id, !jobSeeker.blocked);
+                        actionCell.appendChild(blockButton);
+                    });
+                });
+        }
+
+        function toggleBlockRecruiter(id, block) {
+            fetch(`/api/admin/${block ? 'block' : 'unblock'}-recruiter/${id}`, {
+                method: 'POST',
+            })
+            .then(response => response.text())
+            .then(message => {
+                alert(message);
+                fetchRecruiters();
+            });
+        }
+
+        function toggleBlockJobSeeker(id, block) {
+            fetch(`/api/admin/${block ? 'block' : 'unblock'}-job-seeker/${id}`, {
+                method: 'POST',
+            })
+            .then(response => response.text())
+            .then(message => {
+                alert(message);
+                fetchJobSeekers();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchRecruiters();
+            fetchJobSeekers();
+        });
+     // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('recruiterName'); // Clear name on logout
+            window.location.href = '/'; // Redirect to login page
+        });
+   
+    </script>
+</body>
+</html>

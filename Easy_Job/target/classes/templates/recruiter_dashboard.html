@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background:URL('/css/bg.jpg');
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        header button {
+            background-color: #fff;
+            color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h2 {
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button.post-btn, button.view-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button.post-btn:hover, button.view-btn:hover {
+            background-color: #45a049;
+        }
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome- <span id="recruiterName">${recruiterName}</span></h1>
+        <button id="logoutBtn">Logout</button>
+    </header>
+
+    <main>
+        <section id="job-post-section">
+            <h2>Post a New Job</h2>
+            <form id="jobPostForm">
+                <input type="text" id="jobTitle" placeholder="Job Title" required style="width: 97%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <input type="text" id="jobLocation" placeholder="Location" required style="width: 97%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <textarea id="jobDescription" placeholder="Job Description" required style="width: 97%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;" rows="5"></textarea>
+                <select id="jobCategory" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="IT">IT</option>
+                    <option value="Non-IT">Non-IT</option>
+                </select>
+                <input type="hidden" id="recruiterId" value="1"> <!-- This should be dynamically set to the logged-in recruiter's ID -->
+                <button type="submit" class="post-btn">Post Job</button>
+            </form>
+        </section>
+
+        <section id="job-list-section">
+            <h2>Your Job Posts</h2>
+            <table id="jobTable">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Detail</th>
+                        <th>Category</th>
+                        <th>View Applicants</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Job posts will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    
+    <!-- Applicant Info Modal -->
+    <div id="applicantModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeApplicantModal">&times;</span>
+            <h2>Applicants for Job ID: <span id="modalJobId"></span></h2>
+            <div id="applicantList"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; Easy Jobs || Md. Abdul Kayum || All Right Reserved</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Fetch job posts and display them
+            fetch('/api/job-posts/')
+                .then(response => response.json())
+                .then(jobPosts => {
+                    const jobTableBody = document.getElementById('jobTable').getElementsByTagName('tbody')[0];
+                    jobPosts.forEach(jobPost => {
+                        const row = jobTableBody.insertRow();
+                        row.insertCell(0).textContent = jobPost.title;
+                        row.insertCell(1).textContent = jobPost.description;
+                        row.insertCell(2).textContent = jobPost.category;
+                        
+                        const actionCell = row.insertCell(3);
+                        const viewApplicantsButton = document.createElement('button');
+                        viewApplicantsButton.textContent = 'View Applicants';
+                        viewApplicantsButton.onclick = () => viewApplicants(jobPost.id);
+                        actionCell.appendChild(viewApplicantsButton);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching job posts:', error);
+                });
+            
+         // Display the recruiter's name
+            const recruiterName = localStorage.getItem('recruiterName');
+    if (recruiterName) {
+        document.getElementById('recruiterName').textContent = recruiterName;
+    } else {
+        document.getElementById('recruiterName').textContent = "Guest"; // Default name if not found
+    }
+            
+            // Job post form submission
+            document.getElementById('jobPostForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const jobPost = {
+                    title: document.getElementById('jobTitle').value,
+                    location: document.getElementById('jobLocation').value,
+                    description: document.getElementById('jobDescription').value,
+                    category: document.getElementById('jobCategory').value,
+                    recruiterId: document.getElementById('recruiterId').value,
+                };
+
+                fetch('/api/job-posts/post', { // Adjust this endpoint based on your API
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jobPost)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Error posting job');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Job posted successfully!');
+                    location.reload(); // Refresh the page to see the new job post
+                })
+                .catch(error => {
+                    console.error('Error posting job:', error);
+                    alert('Error: ' + error.message);
+                });
+            });
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('recruiterName'); // Clear name on logout
+                window.location.href = '/'; // Redirect to login page
+            });
+        });
+
+        function viewApplicants(jobId) {
+            // Fetch applicants for the selected job
+            fetch(`/api/applications/${jobId}`)
+                .then(response => response.json())
+                .then(applicants => {
+                    const applicantListDiv = document.getElementById('applicantList');
+                    applicantListDiv.innerHTML = ''; // Clear previous content
+                    const modalJobId = document.getElementById('modalJobId');
+                    modalJobId.textContent = jobId; // Set job ID in modal
+
+                    applicants.forEach(app => {
+                        const applicantInfo = document.createElement('div');
+                        applicantInfo.innerHTML = `
+                            <p>Name: ${app.name}</p>
+                            <p>Email: ${app.email}</p>
+                            <p>Phone: ${app.phone}</p>
+                            <a href="data:application/pdf;base64,${btoa(String.fromCharCode(...new Uint8Array(app.cv)))}" target="_blank">View CV</a>
+                            <hr>
+                        `;
+                        applicantListDiv.appendChild(applicantInfo);
+                    });
+
+                    // Show the modal
+                    document.getElementById('applicantModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching applicants:', error);
+                });
+        }
+
+        // Close modal functionality
+        document.getElementById('closeApplicantModal').addEventListener('click', () => {
+            document.getElementById('applicantModal').style.display = 'none';
+        });
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('applicantModal')) {
+                document.getElementById('applicantModal').style.display = 'none';
+            }
+        };
+
+    </script>
+</body>
+</html>

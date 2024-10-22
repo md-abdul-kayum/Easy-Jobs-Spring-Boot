@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Registration</title>
+    <style>
+        body {
+            background: URL('/css/bg.jpg');
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            color: #4CAF50;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            color: #4CAF50;
+        }
+        .form-control {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            width: calc(100% - 22px); /* to account for padding */
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            text-decoration: none;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #f4f4f4;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-3 {
+            margin-top: 1rem;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Job Seeker Registration</h2>
+        <form id="jobSeekerRegisterForm" method="POST" action="/api/job-seekers/register">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="nid">NID:</label>
+                <input type="text" class="form-control" id="nid" name="nid" placeholder="Enter your NID" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <div class="text-center mt-3">
+                <a href="/job_seeker/login">Already have an account? Login here</a>
+            </div>
+            <div class="text-center mt-3">
+                <a href="/" class="btn btn-primary">Back</a>
+            </div>
+        </form>
+        <footer>
+        <p>&copy; Easy Jobs || Md. Abdul Kayum || All Right Reserved</p>
+    </footer>
+    </div>
+
+    <script>
+        document.getElementById('jobSeekerRegisterForm').onsubmit = function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                nid: document.getElementById('nid').value,
+                password: document.getElementById('password').value
+            };
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Registration failed');
+                return response.json();
+            })
+            .then(data => {
+                alert('Job Seeker Registered Successfully!');
+                window.location.href = "/job_seeker/login";
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        };
+    </script>
+</body>
+</html>

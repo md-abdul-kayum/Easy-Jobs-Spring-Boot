@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal - Landing Page</title>
+    <style>
+        body {
+        background:URL('/css/bg.jpg');
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        .option {
+            margin: 10px;
+            padding: 15px;
+            background-color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            text-align: center;
+            width: 250px;
+            transition: transform 0.2s;
+        }
+        .option:hover {
+            transform: scale(1.05);
+        }
+        .div1 {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 300px;
+    width: 100%;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.div1:hover {
+    transform: translateY(-10px);
+}
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="div1">
+    <h1>Welcome to Easy Jobs</h1>
+
+    <div class="option" id="jobSeekerLogin">
+        Login as Job Seeker
+    </div>
+    <div class="option" id="recruiterLogin">
+        Login as Recruiter
+    </div>
+    <div class="option" id="adminLogin">
+        Login as Admin
+    </div>
+
+    <footer>
+        <p>&copy; Easy Jobs || Md. Abdul Kayum || All Right Reserved</p>
+    </footer>
+</div>
+    <script>
+        // Redirect to login pages when options are clicked
+        document.getElementById('jobSeekerLogin').addEventListener('click', function() {
+            window.location.href = '/job_seeker/login'; // Redirect to Job Seeker Login Page
+        });
+
+        document.getElementById('recruiterLogin').addEventListener('click', function() {
+            window.location.href = '/recruiter/login'; // Redirect to Recruiter Login Page
+        });
+
+        document.getElementById('adminLogin').addEventListener('click', function() {
+            window.location.href = '/admin/login';
+        });
+    </script>
+</body>
+</html>
