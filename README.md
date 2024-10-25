@@ -1,5 +1,5 @@
 # Easy-Jobs Project
-
+View Live Simulation: https://youtu.be/Yx-96I_mgys
 Easy Jobs is an online job portal designed to connect job seekers with recruiters, providing a seamless and user-friendly experience for both parties. The platform includes distinct interfaces for job seekers, recruiters, and admins, each with specific functionalities to manage job applications and postings efficiently.
 
 @Features
